@@ -190,10 +190,6 @@ contract RockPaperScissors is IGame {
         return lifetimescore[player];
     }
 
-    function getPlayers() public view override returns (address[] memory) {
-        return players;
-    }
-
     function getGames(address player) public view returns (Game[] memory) {
         return games[player];
     }

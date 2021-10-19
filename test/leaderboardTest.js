@@ -19,7 +19,7 @@ describe('Leaderboard', function () {
 
     beforeEach(async function () {
         const Leaderboard = await ethers.getContractFactory('Leaderboard');
-        leaderboard = await Leaderboard.deploy();
+        leaderboard = await Leaderboard.deploy(signers.slice(0, 10).map(signer => signer.address));
         await leaderboard.deployed()
 
         const RockPaperScissors = await ethers.getContractFactory('RockPaperScissors');
@@ -92,9 +92,6 @@ describe('Leaderboard', function () {
                 // 5 points for each one
                 await playGame(signers[0], signers[1], Movement.Rock, Movement.Rock);
 
-                const players = await rockPaperScissors.getPlayers();
-                expect(players.length).equals(2);
-
                 // Host wins 3 times in a row
                 // opponent points = 5
                 // host points = 5 + 12 + 14 + 16 = 47
@@ -122,9 +119,6 @@ describe('Leaderboard', function () {
                 // A game ended in draw
                 // 5 points for each one
                 await playGame(signers[0], signers[1], Movement.Rock, Movement.Rock);
-
-                const players = await rockPaperScissors.getPlayers();
-                expect(players.length).equals(2);
 
                 // Opponent wins 3 times in a row
                 // host points = 5

@@ -12,6 +12,7 @@ contract Leaderboard {
         uint256 end;
     }
 
+    address[] playersList;
     address gameAddr;
     Game[] games;
 
@@ -23,11 +24,16 @@ contract Leaderboard {
     event RewardWithdraw(uint256 leaderboardId, address player, uint256 amount);
 
     fallback() external payable {
-        
+
     }
 
     receive() external payable {
         // Nothing to do here
+    }
+
+    constructor(address[] memory players) {
+        require(players.length <= 10, "No more than 10 players can be set for a single board");
+        playersList = players;
     }
 
     // This modifier is used to avoid non players to try to withdraw rewards
@@ -81,15 +87,14 @@ contract Leaderboard {
         );
 
         // Get the players list from game contract
-        address[] memory gamePlayers = gameObj.game.getPlayers();
-        uint256[] memory fullScoresList = new uint256[](gamePlayers.length);
-        if (gamePlayers.length == 0) {
+        uint256[] memory fullScoresList = new uint256[](playersList.length);
+        if (playersList.length == 0) {
             return;
         }
 
         // Iterate over players list to get their scores.
-        for (uint256 i = 0; i < gamePlayers.length; i++) {
-            uint256 score = gameObj.game.getLifetimeScore(gamePlayers[i]);
+        for (uint256 i = 0; i < playersList.length; i++) {
+            uint256 score = gameObj.game.getLifetimeScore(playersList[i]);
             fullScoresList[i] = score;
         }
 
@@ -97,7 +102,7 @@ contract Leaderboard {
         (
             address[] memory top10Players,
             uint256[] memory top10PlayersScores
-        ) = getHighscore(gamePlayers, fullScoresList, 10);
+        ) = getHighscore(playersList, fullScoresList, 10);
 
         // Update game data
         games[leaderboardId].boardPlayers = top10Players;
